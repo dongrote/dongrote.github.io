@@ -1,17 +1,57 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://dongrote.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://dongrote.github.io/" rel="alternate" type="text/html" /><updated>2024-08-14T15:45:23-05:00</updated><id>https://dongrote.github.io/feed.xml</id><title type="html">Ramblings of a Software Engineer</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><author><name>Don Grote</name></author><entry><title type="html">Welcome to Jekyll!</title><link href="https://dongrote.github.io/jekyll/update/2024/08/13/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2024-08-13T14:29:47-05:00</published><updated>2024-08-13T14:29:47-05:00</updated><id>https://dongrote.github.io/jekyll/update/2024/08/13/welcome-to-jekyll</id><content type="html" xml:base="https://dongrote.github.io/jekyll/update/2024/08/13/welcome-to-jekyll.html"><![CDATA[<p>You’ll find this post in your <code class="language-plaintext highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="language-plaintext highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.10.0">Jekyll</generator><link href="https://dongrote.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://dongrote.github.io/" rel="alternate" type="text/html" /><updated>2024-08-14T19:43:47-05:00</updated><id>https://dongrote.github.io/feed.xml</id><title type="html">Ramblings of a Software Engineer</title><subtitle>Don is a Senior Software Engineer who decided it was time to begin chronicling his experiences.</subtitle><entry><title type="html">A Large Language Model Reviewed My Pull Request</title><link href="https://dongrote.github.io/anecdotes/2024/08/14/a-large-language-model-reviewed-my-pull-request.html" rel="alternate" type="text/html" title="A Large Language Model Reviewed My Pull Request" /><published>2024-08-14T16:32:46-05:00</published><updated>2024-08-14T16:32:46-05:00</updated><id>https://dongrote.github.io/anecdotes/2024/08/14/a-large-language-model-reviewed-my-pull-request</id><content type="html" xml:base="https://dongrote.github.io/anecdotes/2024/08/14/a-large-language-model-reviewed-my-pull-request.html"><![CDATA[<p>Recently at work the powers that be added a code review bot that makes suggestions to improve our code. If anybody was
+worried about an <abbr title="Large Language Model">LLM</abbr> replacing them, I suggest you fear not, as they’ve still got
+a ways to go.</p>
 
-<p>Jekyll requires blog post files to be named according to the following format:</p>
+<p>Let’s take a look at a snippet of code from one of my recent pull requests that was examined by our beloved MerlinBot.</p>
 
-<p><code class="language-plaintext highlighter-rouge">YEAR-MONTH-DAY-title.MARKUP</code></p>
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">DownloadFileAsync</span><span class="p">(</span><span class="kt">string</span> <span class="n">id</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellationToken</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">writeStream</span> <span class="p">=</span> <span class="n">fs</span><span class="p">.</span><span class="n">File</span><span class="p">.</span><span class="nf">OpenWrite</span><span class="p">(</span><span class="n">fs</span><span class="p">.</span><span class="n">Path</span><span class="p">.</span><span class="nf">GetTempFileName</span><span class="p">()))</span>
+  <span class="p">{</span>
+    <span class="k">await</span> <span class="nf">CopyToAsync</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">writeStream</span><span class="p">,</span> <span class="n">cancellatonToken</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">writeStream</span><span class="p">.</span><span class="n">Name</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
 
-<p>Where <code class="language-plaintext highlighter-rouge">YEAR</code> is a four-digit number, <code class="language-plaintext highlighter-rouge">MONTH</code> and <code class="language-plaintext highlighter-rouge">DAY</code> are both two-digit numbers, and <code class="language-plaintext highlighter-rouge">MARKUP</code> is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
+<p>This method takes some opaque identifier, uses it to look up a file and proceeds to write it to a local temporary file on disk.
+Assuming the copy succeeds, the path to the temporary file is returned to the caller so that they can use the downloaded file.</p>
 
-<p>Jekyll also offers powerful support for code snippets:</p>
+<p>Here is the improvement suggested by MerlinBot:</p>
 
-<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
-  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
-<span class="k">end</span>
-<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
-<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
+<blockquote>
+  <p><strong>AI code review</strong></p>
 
-<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name>Don Grote</name></author><category term="jekyll" /><category term="update" /><category term="introduction" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry></feed>
+  <p>It might be better to ensure that the temporary file created in <code class="language-plaintext highlighter-rouge">DownloadFileAsync</code> method is cleaned up after its use to avoid leaving unused files on the file system. This can be achieved by deleting the file after its path has been used. Here is the suggested code:</p>
+</blockquote>
+
+<figure class="highlight"><pre><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">async</span> <span class="n">Task</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="nf">DownloadFileAsync</span><span class="p">(</span><span class="kt">string</span> <span class="n">id</span><span class="p">,</span> <span class="n">CancellationToken</span> <span class="n">cancellationToken</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">var</span> <span class="n">tempFileName</span> <span class="p">=</span> <span class="n">fs</span><span class="p">.</span><span class="n">Path</span><span class="p">.</span><span class="nf">GetTempFileName</span><span class="p">();</span>
+  <span class="k">using</span> <span class="p">(</span><span class="kt">var</span> <span class="n">writeStream</span> <span class="p">=</span> <span class="n">fs</span><span class="p">.</span><span class="n">File</span><span class="p">.</span><span class="nf">OpenWrite</span><span class="p">(</span><span class="n">tempFileName</span><span class="p">))</span>
+  <span class="p">{</span>
+    <span class="k">await</span> <span class="nf">CopyToAsync</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">writeStream</span><span class="p">,</span> <span class="n">cancellationToken</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">try</span>
+  <span class="p">{</span>
+    <span class="c1">// Use the file for whatever needed</span>
+    <span class="k">return</span> <span class="n">tempFileName</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">finally</span>
+  <span class="p">{</span>
+    <span class="n">fs</span><span class="p">.</span><span class="n">File</span><span class="p">.</span><span class="nf">Delete</span><span class="p">(</span><span class="n">tempFileName</span><span class="p">);</span> <span class="c1">// Ensure that temporary file is deleted after use</span>
+  <span class="p">}</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>I did my due diligence and provided explicit feedback to the MerlinBot maintainers explaining what was wrong with the suggestion.
+The first issue I pointed out was that the file the caller is expecting to work with is going to be deleted.
+I would’ve expected it to be apparent that the caller is going to use the file since the original method returns
+the path to the populated file.</p>
+
+<p>The second issue that I pointed out is that the operations that are most likely to throw an <code class="language-plaintext highlighter-rouge">Exception</code> are located <em>outside</em>
+of the <code class="language-plaintext highlighter-rouge">try</code> block. The calls to <code class="language-plaintext highlighter-rouge">fs.Path.GetTempFileName()</code> can throw an <code class="language-plaintext highlighter-rouge">IOException</code> when we are unable to create a temporary file.
+The <code class="language-plaintext highlighter-rouge">fs.File.OpenWrite()</code> can throw an <code class="language-plaintext highlighter-rouge">IOException</code> when we’re unable to open the file for writing (e.g.,
+file descriptor table exhaustion). And finally, the most likely offender, the <code class="language-plaintext highlighter-rouge">CopyToAsync()</code> can throw a myriad of
+<code class="language-plaintext highlighter-rouge">Exception</code> types since, in this case, it’s fetching data from a remote system.</p>
+
+<p>Of course, all of this is anecdotal. I’m sure there could be some scenarios where a code review bot will make
+genuinely valuable suggestions but this was not one of them.</p>]]></content><author><name>Don Grote</name></author><category term="anecdotes" /><category term="llm" /><category term="code-review" /><category term="ai" /><summary type="html"><![CDATA[Recently at work the powers that be added a code review bot that makes suggestions to improve our code. If anybody was worried about an LLM replacing them, I suggest you fear not, as they’ve still got a ways to go.]]></summary></entry></feed>
